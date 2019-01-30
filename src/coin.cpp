@@ -8,8 +8,10 @@ Coin::Coin(float x, float y, color_t color, float r) {
     value = 50;
     disabled = 0;
 
-    box.x = x, box.y = y;
-    box.height = box.width = 2*r;
+    speed_x = -0.05;
+    speed_y = 0;
+
+    box = bounding_box_t(x, y, 2*r, 2*r);
 
     GLfloat vertex_buffer_data[] = {
         0, 0, 0,
@@ -42,4 +44,24 @@ void Coin::draw(glm::mat4 VP) {
     glm::mat4 MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
     draw3DObject(this->object);
+}
+
+void Coin::drop() {
+    float a = -9.81, u = this->speed_y, s, t = 1.0/60, v;
+    v = u + a*t;
+    s = u*t + (0.5)*a*(t*t);
+
+    this->position.x += this->speed_x;
+
+    float new_y = this->position.y + s;
+    if (fabs(new_y - ground_y) > this->box.height/2) {
+        this->position.y = new_y;
+        this->speed_y = v;
+    } else {
+        this->disabled = 1;
+        this->speed_y = 0;
+    }
+
+    this->box.x = this->position.x;
+    this->box.y = this->position.y;
 }

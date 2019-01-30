@@ -15,6 +15,9 @@ public:
     int value;
     bool disabled;
 
+    float speed_x, speed_y;
+    void drop();
+
     bounding_box_t box;
 private:
     VAO *object;

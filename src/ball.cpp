@@ -10,6 +10,9 @@ Ball::Ball(float x, float y, color_t color, float ground_level, float ceiling_le
     
     is_jumping = 0;
     dir_x = 0;
+    
+    in_ring = 0;
+    theta = 0;
 
     speed_x = 0.05f;
     speed_y = 0;
@@ -17,7 +20,10 @@ Ball::Ball(float x, float y, color_t color, float ground_level, float ceiling_le
     box.x = x, box.y = y;
     box.width = box.height = 1.0;
 
+    a_y = -9.81;
+
     score = 0;
+    health = 2000;
 
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
@@ -80,10 +86,15 @@ void Ball::set_position(float x, float y) {
 }
 
 void Ball::tick() {
+    if (this->in_ring) {
+
+    }
+    
+    
     // Left or Right Movement
     if (this->dir_x) {
         float new_x = this->position.x + this->dir_x*this->speed_x;
-        if (std::abs(this->dir_x*screen_boundary - new_x) > 0.5) {
+        if (fabs(this->dir_x*screen_boundary + screen_center_x - new_x) > this->box.width/2) {
             this->position.x = new_x;
         }
     }
@@ -91,24 +102,35 @@ void Ball::tick() {
     // Vertical Movement
     if (this->is_jumping) { // Jump
         float new_y = this->position.y + this->speed_x;
-        if (std::abs(new_y - this->ceiling_level) > 0.5) {
+        if (fabs(new_y - this->ceiling_level) > this->box.height/2) {
             this->position.y = new_y;
             this->speed_y = 0;
         }
     }
     else { // Gravity
-        float a = -9.81, u = this->speed_y, s, t = 1.0/60, v;
+        float a = this->a_y, u = this->speed_y, s, t = 1.0/60, v;
 
         v = u + a*t;
         s = u*t + (0.5)*a*(t*t);
 
         float new_y = this->position.y + s;
-        if (std::abs(new_y - this->ground_level) > 0.5) {
-            this->position.y = new_y;
-            this->speed_y = v;
+        if (s <= 0) {
+            if (fabs(new_y - this->ground_level) > this->box.height/2) {
+                this->position.y = new_y;
+                this->speed_y = v;
+            }
+            else {
+                this->position.y = -screen_boundary + 1.0 + 0.5;
+                this->speed_y = 0;
+            }
         } else {
-            this->position.y = -screen_boundary + 1.50;
-            this->speed_y = 0;
+            if (fabs(new_y - this->ceiling_level) > this->box.height/2) {
+                this->position.y = new_y;
+                this->speed_y = v;
+            }
+            else {
+                this->speed_y = 0;
+            }
         }
     }
 

@@ -69,6 +69,10 @@ struct bounding_box_t {
     float y;
     float width;
     float height;
+
+    bounding_box_t() {}
+    bounding_box_t(float x, float y, float width, float height) :
+        x(x), y(y), width(width), height(height) {}
 };
 
 bool detect_collision(bounding_box_t a, bounding_box_t b);
@@ -83,7 +87,25 @@ extern const color_t COLOR_BLACK;
 extern const color_t COLOR_BACKGROUND;
 extern const color_t COLOR_BLUE;
 extern const color_t COLOR_GOLD;
+extern const color_t COLOR_RED_BRIGHT;
+extern const color_t COLOR_RED_DARK;
+extern const color_t COLOR_MAGENTA;
 
-extern float screen_boundary;
+extern float screen_boundary, screen_speed, ground_y;
+
+void init_seven_segs();
+void display_number(glm::mat4 VP, int value, float y_disp);
+
+void draw_jet(glm::mat4 VP);
+
+float gen_rand(float lo, float hi);
+void generate_scene(int index[], int group_index);
+
+bool rect_point(bounding_box_t box, double rectRotation, double pointX, double pointY);
+void rotate_point_about(float& x, float& y, float theta);
+
+#include "semi.h"
+bool intersects(Semi circle, bounding_box_t rect);
+extern float semi_x, semi_y;
 
 #endif

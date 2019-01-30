@@ -1,19 +1,19 @@
-#include "platform.h"
+#include "enemy3.h"
 #include "main.h"
 
-Platform::Platform(float x, float y, color_t color, float height, float width) {
+Enemy3::Enemy3(float x, float y, color_t color, float a, float b) {
     this->position = glm::vec3(x, y, 0);
     this->rotation = 0;
 
-    this->height = height;
-    this->width = width;
-
-    box = bounding_box_t(x, y, width, height);
-
-    dir_y = 0;
+    this->a = a;
+    this->b = b;
     t = 0;
 
-    disabled = 0;
+    this->centre_x = x;
+    this->centre_y = y;
+
+    float width = 0.4, height = 0.4;
+    box = bounding_box_t(x, y, width, height);
 
     GLfloat vertex_buffer_data[] = {
          - width/2, - height/2, 0,
@@ -28,7 +28,7 @@ Platform::Platform(float x, float y, color_t color, float height, float width) {
     this->object = create3DObject(GL_TRIANGLES, 2*3, vertex_buffer_data, color, GL_FILL);
 }
 
-void Platform::draw(glm::mat4 VP) {
+void Enemy3::draw(glm::mat4 VP) {
     Matrices.model = glm::mat4(1.0f);
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
     glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(0, 0, 1));
@@ -40,15 +40,13 @@ void Platform::draw(glm::mat4 VP) {
     draw3DObject(this->object);
 }
 
-void Platform::vertical_shm() {
-    float speed_y = 0.02;
+void Enemy3::orbit() {
+    this->rotation += 15;
+    this->t += 1.0/60;
 
-    if (std::abs(screen_boundary - this->position.y) <= this->height/2) {
-        this->dir_y *= -1;
-    }
-    if (std::abs(ground_y - this->position.y) <= this->height/2) {
-        this->dir_y *= -1;
-    }
-    this->position.y += dir_y*speed_y;
+    this->position.x = this->centre_x + a*cos(t);
+    this->position.y = this->centre_y + b*sin(t);
+
+    this->box.x = this->position.x;
     this->box.y = this->position.y;
 }

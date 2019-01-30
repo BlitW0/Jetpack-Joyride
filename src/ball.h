@@ -14,15 +14,18 @@ public:
     void set_position(float x, float y);
     void tick();
     double speed_x, speed_y;
+    double a_y;
 
     bounding_box_t box;
 
     float dir_x;
     float ground_level, ceiling_level;
     bool is_jumping;
+    bool in_ring;
+    float theta;
 
     int score;
-
+    int health;
 private:
     VAO *object;
 };
